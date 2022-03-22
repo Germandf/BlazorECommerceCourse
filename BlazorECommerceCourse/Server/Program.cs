@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.ResponseCompression;
+global using BlazorECommerceCourse.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,13 +22,9 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
-
 app.UseRouting();
-
-
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
