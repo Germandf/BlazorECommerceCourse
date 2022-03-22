@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32210.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorECommerceCourse.Server", "BlazorECommerceCourse\Server\BlazorECommerceCourse.Server.csproj", "{292DCED8-541B-4756-A759-10127B4B396C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorECommerceCourse.Server", "BlazorECommerceCourse\Server\BlazorECommerceCourse.Server.csproj", "{292DCED8-541B-4756-A759-10127B4B396C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorECommerceCourse.Client", "BlazorECommerceCourse\Client\BlazorECommerceCourse.Client.csproj", "{C9B6B7C1-BBAC-4FB1-8ECC-9DBFA0E5BA48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorECommerceCourse.Client", "BlazorECommerceCourse\Client\BlazorECommerceCourse.Client.csproj", "{C9B6B7C1-BBAC-4FB1-8ECC-9DBFA0E5BA48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorECommerceCourse.Shared", "BlazorECommerceCourse\Shared\BlazorECommerceCourse.Shared.csproj", "{339833F9-9E24-4840-8494-7D5591366F1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorECommerceCourse.Shared", "BlazorECommerceCourse\Shared\BlazorECommerceCourse.Shared.csproj", "{339833F9-9E24-4840-8494-7D5591366F1A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6BB17D18-3A8C-4444-990B-D264A4BA83B2}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
