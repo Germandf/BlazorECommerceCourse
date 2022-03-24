@@ -89,6 +89,19 @@ a, .btn-link {
     text-align: center;
 }
 
+.media-img-big {
+    max-height: 500px;
+    max-width: 500px;
+    border-radius: 6px;
+    margin: 0 10px 10px 10px;
+}
+
+.media-img-wrapper-big {
+    max-width: 500px;
+    max-height: 500px;
+    text-align: center;
+}
+
 .price{
     color: green;
 }
@@ -99,6 +112,15 @@ a, .btn-link {
     }
 
     .media-img-wrapper{
+        width: 100%;
+        height: auto;
+    }
+
+    .media-img-big {
+        max-width: 300px;
+    }
+
+    .media-img-wrapper-big {
         width: 100%;
         height: auto;
     }
