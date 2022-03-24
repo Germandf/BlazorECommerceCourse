@@ -3,7 +3,7 @@
 
 @if(_product is null)
 {
-    <span>Loading...</span>
+    <span>@_message</span>
 }
 else
 {
@@ -24,13 +24,19 @@ else
 @code {
 
     private Product? _product = null;
+    private string _message = string.Empty;
 
     [Parameter]
     public int Id { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        _product = _productService.Products.Find(x => x.Id == Id);
+        _message = "Loading product...";
+        var result = await _productService.GetProduct(Id);
+        if (!result.Success)
+            _message = result.Message;
+        else
+            _product = result.Data;
     }
 
 }

@@ -17,8 +17,13 @@ public class ProductController : ControllerBase
     public async Task<ActionResult<ServiceResponse<List<Product>>>> GetProducts()
     {
         var response = await _productService.GetProducts();
-        if(response.Success)
-            return Ok(response);
-        return BadRequest(response);
+        return Ok(response);
+    }
+
+    [HttpGet("{productId}")]
+    public async Task<ActionResult<ServiceResponse<Product>>> GetProduct(int productId)
+    {
+        var response = await _productService.GetProduct(productId);
+        return Ok(response);
     }
 }
