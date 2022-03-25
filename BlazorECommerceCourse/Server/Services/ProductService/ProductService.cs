@@ -26,4 +26,16 @@ public class ProductService : IProductService
         };
         return response;
     }
+
+    public async Task<ServiceResponse<List<Product>>> GetProductsByCategory(string categoryUrl)
+    {
+        var response = new ServiceResponse<List<Product>>()
+        {
+            Success = true,
+            Data = await _context.Products
+                .Where(x => x.Category.Url.ToLower().Equals(categoryUrl.ToLower()))
+                .ToListAsync()
+        };
+        return response;
+    }
 }
