@@ -14,9 +14,14 @@ else
         <div class="media-body">
             <h2 class="mb-0">@_product.Title</h2>
             <p>@_product.Description</p>
-            <h4 class="price">
-                @*$@_product.Price*@
-            </h4>
+            @if (GetSelectedVariant() is not null)
+            {
+                @if (GetSelectedVariant()!.OriginalPrice > GetSelectedVariant()!.Price)
+                {
+                    <h6 class="text-muted original-price">@GetSelectedVariant()!.OriginalPrice</h6>
+                }
+                <h4 class="price">$@GetSelectedVariant()!.Price</h4>
+            }
         </div>
     </div>
 }
@@ -25,6 +30,7 @@ else
 
     private Product? _product = null;
     private string _message = string.Empty;
+    private int _currentTypeId = 1;
 
     [Parameter]
     public int Id { get; set; }
@@ -35,8 +41,17 @@ else
         var result = await _productService.GetProduct(Id);
         if (!result.Success)
             _message = result.Message;
-        else
+        else if (result.Data is not null)
+        {
             _product = result.Data;
+            if (_product.Variants.Count > 0)
+                _currentTypeId = _product.Variants[0].ProductTypeId;
+        }
+
     }
+
+    private ProductVariant? GetSelectedVariant() =>
+        _product is null ? null : _product.Variants.FirstOrDefault(x => x.ProductTypeId == _currentTypeId);
+    
 
 }
