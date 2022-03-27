@@ -11,9 +11,9 @@ public class ProductService : IProductService
         _httpClient = httpClient;
     }
 
-    public List<Product> Products { get; set; } = new();
-
     public event Action ProductsChanged;
+    public List<Product> Products { get; set; } = new();
+    public string Message { get; set; } = "Loading products...";
 
     public async Task<ServiceResponse<Product>> GetProduct(int productId)
     {
@@ -28,6 +28,25 @@ public class ProductService : IProductService
             await _httpClient.GetFromJsonAsync<ServiceResponse<List<Product>>>($"api/product/category/{categoryUrl}");
         if (result is not null && result.Data is not null)
             Products = result.Data;
-        ProductsChanged.Invoke();
+        ProductsChanged?.Invoke();
+    }
+
+    public async Task<List<string>> GetProductSearchSuggestions(string searchText)
+    {
+        var result = await _httpClient.GetFromJsonAsync<ServiceResponse<List<string>>>($"api/product/searchsuggestions/{searchText}");
+        if (result is not null && result.Data is not null)
+            return result.Data;
+        else
+            return new();
+    }
+
+    public async Task SearchProducts(string searchText)
+    {
+        var result = await _httpClient.GetFromJsonAsync<ServiceResponse<List<Product>>>($"api/product/search/{searchText}");
+        if (result is not null && result.Data is not null)
+            Products = result.Data;
+        if (!Products.Any())
+            Message = "No products found.";
+        ProductsChanged?.Invoke();
     }
 }

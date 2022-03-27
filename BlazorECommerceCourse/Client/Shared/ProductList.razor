@@ -3,7 +3,7 @@
 
 @if (_productService.Products is null || !_productService.Products.Any())
 {
-    <span>Loading products...</span>
+    <span>@_productService.Message</span>
 }
 else
 {
