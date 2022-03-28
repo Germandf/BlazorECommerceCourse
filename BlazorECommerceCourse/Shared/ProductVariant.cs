@@ -2,7 +2,6 @@
 using System.Text.Json.Serialization;
 
 namespace BlazorECommerceCourse.Shared;
-
 public class ProductVariant
 {
     [JsonIgnore]
