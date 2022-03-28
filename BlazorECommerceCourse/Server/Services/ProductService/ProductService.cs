@@ -9,6 +9,18 @@ public class ProductService : IProductService
         _context = context;
     }
 
+    public async Task<ServiceResponse<List<Product>>> GetFeaturedProducts()
+    {
+        var response = new ServiceResponse<List<Product>>
+        {
+            Success = true,
+            Data = await _context.Products.Where(x => x.Featured)
+                .Include(x => x.Variants)
+                .ToListAsync()
+        };
+        return response;
+    }
+
     public async Task<ServiceResponse<Product?>> GetProduct(int productId)
     {
         var product = await _context.Products

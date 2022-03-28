@@ -28,23 +28,30 @@ public class ProductController : ControllerBase
     }
 
     [HttpGet("category/{categoryUrl}")]
-    public async Task<ActionResult<ServiceResponse<Product>>> GetProductsByCategory(string categoryUrl)
+    public async Task<ActionResult<ServiceResponse<List<Product>>>> GetProductsByCategory(string categoryUrl)
     {
         var response = await _productService.GetProductsByCategory(categoryUrl);
         return Ok(response);
     }
 
     [HttpGet("search/{searchText}")]
-    public async Task<ActionResult<ServiceResponse<Product>>> SearchProducts(string searchText)
+    public async Task<ActionResult<ServiceResponse<List<Product>>>> SearchProducts(string searchText)
     {
         var response = await _productService.SearchProducts(searchText);
         return Ok(response);
     }
 
     [HttpGet("searchsuggestions/{searchText}")]
-    public async Task<ActionResult<ServiceResponse<string>>> GetProductSearchSuggestions(string searchText)
+    public async Task<ActionResult<ServiceResponse<List<string>>>> GetProductSearchSuggestions(string searchText)
     {
         var response = await _productService.GetProductSearchSuggestions(searchText);
+        return Ok(response);
+    }
+
+    [HttpGet("featured")]
+    public async Task<ActionResult<ServiceResponse<List<Product>>>> GetFeaturedProducts()
+    {
+        var response = await _productService.GetFeaturedProducts();
         return Ok(response);
     }
 }
