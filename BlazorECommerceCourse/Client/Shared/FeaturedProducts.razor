@@ -1,0 +1,43 @@
+﻿@inject IProductService _productService
+@implements IDisposable
+
+<center><h2>Today's Featured Products</h2></center>
+@if (_productService.Products is null || !_productService.Products.Any())
+{
+    <span>@_productService.Message</span>
+}
+else
+{
+    <div class="container">
+        @foreach (var product in _productService.Products)
+        {
+            @if (product.Featured)
+            {
+                <div class="featured-product">
+                    <div>
+                        <a href="product/@product.Id">
+                            <img src="@product.ImageUrl">
+                        </a>
+                        <h4><a href="product/@product.Id">@product.Title</a></h4>
+                        @if (product.Variants is not null && product.Variants.Any())
+                        {
+                            <h5 class="price">
+                                $@product.Variants[0].Price
+                            </h5>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+
+@code {
+
+    protected override void OnInitialized() =>
+        _productService.ProductsChanged += StateHasChanged;
+
+    public void Dispose() =>
+        _productService.ProductsChanged -= StateHasChanged;
+
+}
