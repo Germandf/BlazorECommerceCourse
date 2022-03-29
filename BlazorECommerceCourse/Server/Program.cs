@@ -3,6 +3,7 @@ global using BlazorECommerceCourse.Server.Services.ProductService;
 global using BlazorECommerceCourse.Server.Services.CategoryService;
 global using BlazorECommerceCourse.Shared;
 global using Microsoft.EntityFrameworkCore;
+using BlazorECommerceCourse.Server.Services.CartService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +17,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 
