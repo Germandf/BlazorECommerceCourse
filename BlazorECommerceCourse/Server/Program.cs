@@ -4,6 +4,7 @@ global using BlazorECommerceCourse.Server.Services.CategoryService;
 global using BlazorECommerceCourse.Shared;
 global using Microsoft.EntityFrameworkCore;
 using BlazorECommerceCourse.Server.Services.CartService;
+using BlazorECommerceCourse.Server.Services.AuthService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
