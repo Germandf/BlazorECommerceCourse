@@ -22,7 +22,7 @@ public class AuthService : IAuthService
         user.PasswordSalt = passwordSalt;
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-        return new() { Success = true, Data = user.Id };
+        return new() { Success = true, Data = user.Id, Message = "Registration successful" };
     }
 
     public async Task<bool> UserExists(string email)

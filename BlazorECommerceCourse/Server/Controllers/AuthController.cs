@@ -1,5 +1,4 @@
 ﻿using BlazorECommerceCourse.Server.Services.AuthService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorECommerceCourse.Server.Controllers;

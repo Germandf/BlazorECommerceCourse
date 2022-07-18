@@ -2,6 +2,7 @@ global using BlazorECommerceCourse.Client.Services.CategoryService;
 global using BlazorECommerceCourse.Client.Services.ProductService;
 global using BlazorECommerceCourse.Shared;
 using BlazorECommerceCourse.Client;
+using BlazorECommerceCourse.Client.Services.AuthService;
 using BlazorECommerceCourse.Client.Services.CartService;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Web;
@@ -16,6 +17,6 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
-
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 await builder.Build().RunAsync();
