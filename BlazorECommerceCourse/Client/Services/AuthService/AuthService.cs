@@ -11,6 +11,13 @@ public class AuthService : IAuthService
         _httpClient = httpClient;
     }
 
+    public async Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request)
+    {
+        var result = await _httpClient.PostAsJsonAsync("api/auth/change-password", request.Password);
+        return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>() ??
+            new() { Success = false, Message = "Unknown error, please try again later" };
+    }
+
     public async Task<ServiceResponse<string>> Login(UserLogin request)
     {
         var result = await _httpClient.PostAsJsonAsync("api/auth/login", request);
