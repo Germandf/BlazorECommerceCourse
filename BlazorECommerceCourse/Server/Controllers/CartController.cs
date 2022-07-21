@@ -1,4 +1,6 @@
-﻿using BlazorECommerceCourse.Server.Services.CartService;
+﻿using System.Security.Claims;
+using BlazorECommerceCourse.Server.Services.CartService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorECommerceCourse.Server.Controllers;
@@ -14,9 +16,18 @@ public class CartController : ControllerBase
     }
 
     [HttpPost("products")]
-    public async Task<ActionResult<ServiceResponse<List<CartProductDto>>>> GetCartProducts(List<CartItem> cartItems)
+    public async Task<ActionResult<ServiceResponse<List<CartProductResponse>>>> GetCartProducts(List<CartItem> cartItems)
     {
         var result = await _cartService.GetCartProducts(cartItems);
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [Authorize]
+    public async Task<ActionResult<ServiceResponse<List<CartProductResponse>>>> StoreCartItems(List<CartItem> cartItems)
+    {
+        var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var result = await _cartService.StoreCartItems(cartItems, userId);
         return Ok(result);
     }
 }

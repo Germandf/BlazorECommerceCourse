@@ -1,5 +1,5 @@
 ﻿namespace BlazorECommerceCourse.Shared;
-public class CartProductDto
+public class CartProductResponse
 {
     public int ProductId { get; set; }
     public string Title { get; set; } = string.Empty;

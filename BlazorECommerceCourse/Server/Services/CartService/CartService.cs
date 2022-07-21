@@ -9,9 +9,9 @@ public class CartService : ICartService
         _context = context;
     }
 
-    public async Task<ServiceResponse<List<CartProductDto>>> GetCartProducts(List<CartItem> cartItems)
+    public async Task<ServiceResponse<List<CartProductResponse>>> GetCartProducts(List<CartItem> cartItems)
     {
-        var result = new ServiceResponse<List<CartProductDto>>()
+        var result = new ServiceResponse<List<CartProductResponse>>()
         {
             Success = true,
             Data = new()
@@ -27,7 +27,7 @@ public class CartService : ICartService
                 .FirstOrDefaultAsync(x => x.ProductId == cartItem.ProductId && x.ProductTypeId == cartItem.ProductTypeId);
             if (productVariant is null)
                 continue;
-            var cartProduct = new CartProductDto()
+            var cartProduct = new CartProductResponse()
             {
                 ProductId = product.Id,
                 Title = product.Title,
@@ -40,5 +40,15 @@ public class CartService : ICartService
             result.Data.Add(cartProduct);
         }
         return result;
+    }
+
+    public async Task<ServiceResponse<List<CartProductResponse>>> StoreCartItems(List<CartItem> cartItems, int userId)
+    {
+        cartItems.ForEach(x => x.UserId = userId);
+        _context.CartItems.AddRange(cartItems);
+        await _context.SaveChangesAsync();
+
+        return await GetCartProducts(
+            await _context.CartItems.Where(x => x.UserId == userId).ToListAsync());
     }
 }
