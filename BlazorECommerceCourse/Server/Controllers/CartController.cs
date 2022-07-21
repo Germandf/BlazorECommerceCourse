@@ -37,6 +37,14 @@ public class CartController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPut("update-quantity")]
+    [Authorize]
+    public async Task<ActionResult<ServiceResponse<List<CartProductResponse>>>> UpdateQuantity(CartItem cartItem)
+    {
+        var result = await _cartService.UpdateQuantity(cartItem);
+        return Ok(result);
+    }
+
     [HttpGet("count")]
     public async Task<ActionResult<ServiceResponse<int>>> GetCartItemsCount()
     {

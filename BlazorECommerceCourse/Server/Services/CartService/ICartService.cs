@@ -7,4 +7,5 @@ public interface ICartService
     Task<ServiceResponse<int>> GetCartItemsCount();
     Task<ServiceResponse<List<CartProductResponse>>> GetStoredCartProducts();
     Task<ServiceResponse<bool>> AddToCart(CartItem cartItem);
+    Task<ServiceResponse<bool>> UpdateQuantity(CartItem cartItem);
 }

@@ -19,18 +19,18 @@ public class CartService : ICartService
     {
         var userId = GetUserId();
         cartItem.UserId = userId;
-        
-        var sameItem = await _context.CartItems.FirstOrDefaultAsync(x => 
-            x.ProductId == cartItem.ProductId && x.ProductTypeId == cartItem.ProductTypeId && x.UserId == cartItem.UserId);
-        
-        if (sameItem is null)
+        var dbCartItem = await GetCartItem(cartItem);
+
+        if (dbCartItem is null)
             _context.CartItems.Add(cartItem);
         else
-            sameItem.Quantity += cartItem.Quantity;
-        
+            dbCartItem.Quantity += cartItem.Quantity;
+
         await _context.SaveChangesAsync();
         return new() { Success = true, Data = true };
     }
+
+    
 
     public async Task<ServiceResponse<int>> GetCartItemsCount()
     {
@@ -91,6 +91,24 @@ public class CartService : ICartService
 
         return await GetStoredCartProducts();
     }
+
+    public async Task<ServiceResponse<bool>> UpdateQuantity(CartItem cartItem)
+    {
+        var userId = GetUserId();
+        cartItem.UserId = userId;
+        var dbCartItem = await GetCartItem(cartItem);
+
+        if (dbCartItem is null)
+            return new() { Success = false, Data = false, Message = "Cart item does not exist." };
+
+        dbCartItem.Quantity = cartItem.Quantity;
+        await _context.SaveChangesAsync();
+        return new() { Success = true, Data = true };
+    }
+
+    private async Task<CartItem?> GetCartItem(CartItem cartItem) =>
+        await _context.CartItems.FirstOrDefaultAsync(x =>
+            x.ProductId == cartItem.ProductId && x.ProductTypeId == cartItem.ProductTypeId && x.UserId == cartItem.UserId);
 
     private int GetUserId() =>
         int.Parse(_contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
