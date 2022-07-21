@@ -15,6 +15,23 @@ public class CartService : ICartService
         _contextAccessor = contextAccessor;
     }
 
+    public async Task<ServiceResponse<bool>> AddToCart(CartItem cartItem)
+    {
+        var userId = GetUserId();
+        cartItem.UserId = userId;
+        
+        var sameItem = await _context.CartItems.FirstOrDefaultAsync(x => 
+            x.ProductId == cartItem.ProductId && x.ProductTypeId == cartItem.ProductTypeId && x.UserId == cartItem.UserId);
+        
+        if (sameItem is null)
+            _context.CartItems.Add(cartItem);
+        else
+            sameItem.Quantity += cartItem.Quantity;
+        
+        await _context.SaveChangesAsync();
+        return new() { Success = true, Data = true };
+    }
+
     public async Task<ServiceResponse<int>> GetCartItemsCount()
     {
         var cartItems = await _context.CartItems.Where(x => x.UserId == GetUserId()).ToListAsync();
@@ -67,10 +84,7 @@ public class CartService : ICartService
 
     public async Task<ServiceResponse<List<CartProductResponse>>> StoreCartItems(List<CartItem> cartItems)
     {
-        var nullableUserId = GetUserId();
-        if (nullableUserId is not int userId)
-            return new() { Success = false, Message = "User not found" };
-
+        var userId = GetUserId();
         cartItems.ForEach(x => x.UserId = userId);
         _context.CartItems.AddRange(cartItems);
         await _context.SaveChangesAsync();
@@ -78,16 +92,7 @@ public class CartService : ICartService
         return await GetStoredCartProducts();
     }
 
-    private int? GetUserId()
-    {
-        try
-        {
-            return int.Parse(_contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-        }
-        catch
-        {
-            return null;
-        }
-    }
-        
+    private int GetUserId() =>
+        int.Parse(_contextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
 }

@@ -60,7 +60,7 @@ else
 
     private async Task UpdateQuantity(ChangeEventArgs e, CartProductResponse product)
     {
-        product.Quantity = int.Parse(e.Value.ToString());
+        product.Quantity = int.Parse(e.Value?.ToString() ?? "0");
         if (product.Quantity < 1)
             product.Quantity = 1;
         await _cartService.UpdateQuantity(product);

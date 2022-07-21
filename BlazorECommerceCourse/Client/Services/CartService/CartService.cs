@@ -25,24 +25,23 @@ public class CartService : ICartService
     {
         if (await UserIsAuthenticated())
         {
-            Console.WriteLine("User is authenticated");
+            await _httpClient.PostAsJsonAsync("api/cart/add", cartItem);
         }
         else
         {
-            Console.WriteLine("User is not authenticated");
+            var cart = await _localStorage.GetItemAsync<List<CartItem>>("cart");
+            if (cart is null)
+                cart = new();
+
+            var sameItem = cart.Find(x => x.ProductId == cartItem.ProductId && x.ProductTypeId == cartItem.ProductTypeId);
+            if (sameItem is null)
+                cart.Add(cartItem);
+            else
+                sameItem.Quantity += cartItem.Quantity;
+
+            await _localStorage.SetItemAsync("cart", cart);
         }
-
-        var cart = await _localStorage.GetItemAsync<List<CartItem>>("cart");
-        if (cart is null)
-            cart = new();
-
-        var sameItem = cart.Find(x => x.ProductId == cartItem.ProductId && x.ProductTypeId == cartItem.ProductTypeId);
-        if (sameItem is null)
-            cart.Add(cartItem);
-        else
-            sameItem.Quantity += cartItem.Quantity;
-
-        await _localStorage.SetItemAsync("cart", cart);
+        
         await GetCartItemsCount();
     }
 

@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using BlazorECommerceCourse.Server.Services.CartService;
+﻿using BlazorECommerceCourse.Server.Services.CartService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,6 +26,14 @@ public class CartController : ControllerBase
     public async Task<ActionResult<ServiceResponse<List<CartProductResponse>>>> StoreCartItems(List<CartItem> cartItems)
     {
         var result = await _cartService.StoreCartItems(cartItems);
+        return Ok(result);
+    }
+
+    [HttpPost("add")]
+    [Authorize]
+    public async Task<ActionResult<ServiceResponse<List<CartProductResponse>>>> AddToCart(CartItem cartItem)
+    {
+        var result = await _cartService.AddToCart(cartItem);
         return Ok(result);
     }
 
