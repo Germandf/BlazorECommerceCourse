@@ -51,13 +51,11 @@ else
 
     private async Task LoadCart()
     {
-        if((await _cartService.GetCartItems()).Any())
-            _cartProducts = await _cartService.GetCartProducts();
-        else
-        {
+        await _cartService.GetCartItemsCount();
+        _cartProducts = await _cartService.GetCartProducts();
+
+        if(_cartProducts is null || _cartProducts.Count == 0)
             _message = "Your cart is empty.";
-            _cartProducts = new();
-        }
     }
 
     private async Task UpdateQuantity(ChangeEventArgs e, CartProductResponse product)

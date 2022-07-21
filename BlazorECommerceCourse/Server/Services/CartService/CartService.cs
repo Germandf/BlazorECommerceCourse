@@ -59,6 +59,12 @@ public class CartService : ICartService
         return result;
     }
 
+    public async Task<ServiceResponse<List<CartProductResponse>>> GetStoredCartProducts()
+    {
+        var userCartItems = await _context.CartItems.Where(x => x.UserId == GetUserId()).ToListAsync();
+        return await GetCartProducts(userCartItems);
+    }
+
     public async Task<ServiceResponse<List<CartProductResponse>>> StoreCartItems(List<CartItem> cartItems)
     {
         var nullableUserId = GetUserId();
@@ -69,8 +75,7 @@ public class CartService : ICartService
         _context.CartItems.AddRange(cartItems);
         await _context.SaveChangesAsync();
 
-        return await GetCartProducts(
-            await _context.CartItems.Where(x => x.UserId == userId).ToListAsync());
+        return await GetStoredCartProducts();
     }
 
     private int? GetUserId()

@@ -46,21 +46,23 @@ public class CartService : ICartService
         await GetCartItemsCount();
     }
 
-    public async Task<List<CartItem>> GetCartItems()
-    {
-        await GetCartItemsCount();
-        var cart = await _localStorage.GetItemAsync<List<CartItem>>("cart");
-        if (cart is null)
-            cart = new();
-        return cart;
-    }
-
     public async Task<List<CartProductResponse>> GetCartProducts()
     {
-        var cartItems = await _localStorage.GetItemAsync<List<CartItem>>("cart");
-        var response = await _httpClient.PostAsJsonAsync("api/cart/products", cartItems);
-        var cartProducts = await response.Content.ReadFromJsonAsync<ServiceResponse<List<CartProductResponse>>>();
-        return cartProducts?.Data ?? new();
+        if (await UserIsAuthenticated())
+        {
+            var response = await _httpClient.GetFromJsonAsync<ServiceResponse<List<CartProductResponse>>>("api/cart");
+            return response?.Data ?? new();
+        }
+        else
+        {
+            var cartItems = await _localStorage.GetItemAsync<List<CartItem>>("cart");
+            if (cartItems is null)
+                return new();
+
+            var response = await _httpClient.PostAsJsonAsync("api/cart/products", cartItems);
+            var cartProducts = await response.Content.ReadFromJsonAsync<ServiceResponse<List<CartProductResponse>>>();
+            return cartProducts?.Data ?? new();
+        }
     }
 
     public async Task RemoveProductFromCart(int productId, int productTypeId)
