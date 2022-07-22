@@ -1,10 +1,11 @@
 global using BlazorECommerceCourse.Server.Data;
 global using BlazorECommerceCourse.Server.Services.ProductService;
 global using BlazorECommerceCourse.Server.Services.CategoryService;
+global using BlazorECommerceCourse.Server.Services.AuthService;
+global using BlazorECommerceCourse.Server.Services.CartService;
+global using BlazorECommerceCourse.Server.Services.OrderService;
 global using BlazorECommerceCourse.Shared;
 global using Microsoft.EntityFrameworkCore;
-using BlazorECommerceCourse.Server.Services.CartService;
-using BlazorECommerceCourse.Server.Services.AuthService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

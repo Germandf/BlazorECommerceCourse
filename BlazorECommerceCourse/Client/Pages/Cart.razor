@@ -1,5 +1,6 @@
 ﻿@page "/cart"
 @inject ICartService _cartService
+@inject IOrderService _orderService
 
 <PageTitle>Shopping Cart</PageTitle>
 
@@ -33,6 +34,7 @@ else
             Total (@_cartProducts.Count): $@_cartProducts.Sum(x => x.Price * x.Quantity)
         </div>
     </div>
+    <button @onclick="PlaceOrder" class="btn alert-success float-end mt-1">Place Order</button>
 }
 
 @code {
@@ -64,6 +66,11 @@ else
         if (product.Quantity < 1)
             product.Quantity = 1;
         await _cartService.UpdateQuantity(product);
+    }
+
+    private async Task PlaceOrder()
+    {
+        await _orderService.PlaceOrder();
     }
 
 }
