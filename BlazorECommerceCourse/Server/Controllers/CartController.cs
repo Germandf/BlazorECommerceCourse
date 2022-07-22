@@ -39,9 +39,17 @@ public class CartController : ControllerBase
 
     [HttpPut("update-quantity")]
     [Authorize]
-    public async Task<ActionResult<ServiceResponse<List<CartProductResponse>>>> UpdateQuantity(CartItem cartItem)
+    public async Task<ActionResult<ServiceResponse<bool>>> UpdateQuantity(CartItem cartItem)
     {
         var result = await _cartService.UpdateQuantity(cartItem);
+        return Ok(result);
+    }
+
+    [HttpDelete("{productId}/{productTypeId}")]
+    [Authorize]
+    public async Task<ActionResult<ServiceResponse<bool>>> RemoveItemFromCart(int productId, int productTypeId)
+    {
+        var result = await _cartService.RemoveItemFromCart(productId, productTypeId);
         return Ok(result);
     }
 

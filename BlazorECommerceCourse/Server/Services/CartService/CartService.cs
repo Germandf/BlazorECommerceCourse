@@ -82,6 +82,21 @@ public class CartService : ICartService
         return await GetCartProducts(userCartItems);
     }
 
+    public async Task<ServiceResponse<bool>> RemoveItemFromCart(int productId, int productTypeId)
+    {
+        var userId = GetUserId();
+        var dbCartItem = await _context.CartItems.FirstOrDefaultAsync(
+            x => x.ProductId == productId && x.ProductTypeId == productTypeId && x.UserId == userId);
+
+        if (dbCartItem is null)
+            return new() { Success = false, Data = false, Message = "Cart item does not exist." };
+
+        _context.CartItems.Remove(dbCartItem);
+        await _context.SaveChangesAsync();
+
+        return new() { Success = true, Data = true };
+    }
+
     public async Task<ServiceResponse<List<CartProductResponse>>> StoreCartItems(List<CartItem> cartItems)
     {
         var userId = GetUserId();
