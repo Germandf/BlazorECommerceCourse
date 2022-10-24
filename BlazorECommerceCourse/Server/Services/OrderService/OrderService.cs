@@ -35,8 +35,11 @@ public class OrderService : IOrderService
                 Quantity = product.Quantity, TotalPrice = product.Price * product.Quantity });
         }
 
-        var order = new Order() { UserId = GetUserId(), OrderDate = DateTime.Now, TotalPrice = totalPrice, OrderItems = orderItems };
+        var order = new Order() { 
+            UserId = GetUserId(), OrderDate = DateTime.Now, TotalPrice = totalPrice, OrderItems = orderItems };
+
         _context.Orders.Add(order);
+        _context.CartItems.RemoveRange(_context.CartItems.Where(x => x.UserId == GetUserId()));
         await _context.SaveChangesAsync();
         return new() { Success = true, Data = true };
     }
