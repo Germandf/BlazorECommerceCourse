@@ -10,13 +10,16 @@ public class AuthService : IAuthService
 {
     private readonly DataContext _context;
     private readonly IConfiguration _configuration;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public AuthService(
-        DataContext dataContext, 
-        IConfiguration configuration)
+        DataContext dataContext,
+        IConfiguration configuration,
+        IHttpContextAccessor httpContextAccessor)
     {
         _context = dataContext;
         _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<ServiceResponse<string>> Login(string email, string password)
@@ -105,4 +108,6 @@ public class AuthService : IAuthService
         await _context.SaveChangesAsync();
         return new() { Success = true, Message = "Password has been changed." };
     }
+
+    public int GetUserId() => int.Parse(_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }

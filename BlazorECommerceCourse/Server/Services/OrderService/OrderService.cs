@@ -1,21 +1,19 @@
-﻿using System.Security.Claims;
-
-namespace BlazorECommerceCourse.Server.Services.OrderService;
+﻿namespace BlazorECommerceCourse.Server.Services.OrderService;
 
 public class OrderService : IOrderService
 {
     private readonly DataContext _context;
     private readonly ICartService _cartService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IAuthService _authService;
 
     public OrderService(
-        DataContext context, 
-        ICartService cartService, 
-        IHttpContextAccessor httpContextAccessor)
+        DataContext context,
+        ICartService cartService,
+        IAuthService authService)
     {
         _context = context;
         _cartService = cartService;
-        _httpContextAccessor = httpContextAccessor;
+        _authService = authService;
     }
 
     public async Task<ServiceResponse<bool>> PlaceOrder()
@@ -36,14 +34,11 @@ public class OrderService : IOrderService
         }
 
         var order = new Order() { 
-            UserId = GetUserId(), OrderDate = DateTime.Now, TotalPrice = totalPrice, OrderItems = orderItems };
+            UserId = _authService.GetUserId(), OrderDate = DateTime.Now, TotalPrice = totalPrice, OrderItems = orderItems };
 
         _context.Orders.Add(order);
-        _context.CartItems.RemoveRange(_context.CartItems.Where(x => x.UserId == GetUserId()));
+        _context.CartItems.RemoveRange(_context.CartItems.Where(x => x.UserId == _authService.GetUserId()));
         await _context.SaveChangesAsync();
         return new() { Success = true, Data = true };
     }
-
-    private int GetUserId() =>
-        int.Parse(_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }
