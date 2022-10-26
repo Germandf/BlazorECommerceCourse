@@ -16,6 +16,47 @@ public class OrderService : IOrderService
         _authService = authService;
     }
 
+    public async Task<ServiceResponse<OrderDetailsResponse>> GetOrderDetails(int orderId)
+    {
+        var response = new ServiceResponse<OrderDetailsResponse>();
+
+        var order = await _context.Orders
+            .Include(x => x.OrderItems)
+            .ThenInclude(x => x.Product)
+            .Include(x => x.OrderItems)
+            .ThenInclude(x => x.ProductType)
+            .Where(x => x.UserId == _authService.GetUserId() && x.Id == orderId)
+            .OrderByDescending(x => x.OrderDate)
+            .FirstOrDefaultAsync();
+
+        if (order is null)
+        {
+            response.Success = false;
+            response.Message = "Order not found.";
+            return response;
+        }
+
+        var orderDetailResponse = new OrderDetailsResponse()
+        {
+            OrderDate = order.OrderDate,
+            TotalPrice = order.TotalPrice,
+            Products = new()
+        };
+
+        order.OrderItems.ForEach(x => orderDetailResponse.Products.Add(new()
+        {
+            ProductId = x.ProductId,
+            ImageUrl = x.Product.ImageUrl,
+            ProductType = x.ProductType.Name,
+            Quantity = x.Quantity,
+            Title = x.Product.Title,
+            TotalPrice = x.TotalPrice
+        }));
+
+        response.Data = orderDetailResponse;
+        return response;
+    }
+
     public async Task<ServiceResponse<List<OrderOverviewResponse>>> GetOrders()
     {
         var response = new ServiceResponse<List<OrderOverviewResponse>>();
