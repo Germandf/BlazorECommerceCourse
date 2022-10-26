@@ -16,6 +16,34 @@ public class OrderService : IOrderService
         _authService = authService;
     }
 
+    public async Task<ServiceResponse<List<OrderOverviewResponse>>> GetOrders()
+    {
+        var response = new ServiceResponse<List<OrderOverviewResponse>>();
+
+        var orders = await _context.Orders
+            .Include(x => x.OrderItems)
+            .ThenInclude(x => x.Product)
+            .Where(x => x.UserId == _authService.GetUserId())
+            .OrderByDescending(x => x.OrderDate)
+            .ToListAsync();
+
+        var orderResponses = new List<OrderOverviewResponse>();
+
+        orders.ForEach(x => orderResponses.Add(new OrderOverviewResponse()
+        {
+            Id = x.Id,
+            OrderDate = x.OrderDate,
+            TotalPrice = x.TotalPrice,
+            Product = x.OrderItems.Count > 1 ? 
+                $"{x.OrderItems.First().Product.Title} and {x.OrderItems.Count - 1} more..." :
+                x.OrderItems.First().Product.Title,
+            ProductImageUrl = x.OrderItems.First().Product.ImageUrl
+        }));
+
+        response.Data = orderResponses;
+        return response;
+    }
+
     public async Task<ServiceResponse<bool>> PlaceOrder()
     {
         var products = (await _cartService.GetStoredCartProducts()).Data;
