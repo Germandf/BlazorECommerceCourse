@@ -5,10 +5,12 @@ namespace BlazorECommerceCourse.Client.Services.AuthService;
 public class AuthService : IAuthService
 {
     private readonly HttpClient _httpClient;
+    private readonly AuthenticationStateProvider _authStateProvider;
 
-    public AuthService(HttpClient httpClient)
+    public AuthService(HttpClient httpClient, AuthenticationStateProvider authStateProvider)
     {
         _httpClient = httpClient;
+        _authStateProvider = authStateProvider;
     }
 
     public async Task<ServiceResponse<bool>> ChangePassword(UserChangePassword request)
@@ -16,6 +18,11 @@ public class AuthService : IAuthService
         var result = await _httpClient.PostAsJsonAsync("api/auth/change-password", request.Password);
         return await result.Content.ReadFromJsonAsync<ServiceResponse<bool>>() ??
             new() { Success = false, Message = "Unknown error, please try again later" };
+    }
+
+    public async Task<bool> IsUserAuthenticated()
+    {
+        return (await _authStateProvider.GetAuthenticationStateAsync()).User.Identity?.IsAuthenticated ?? false;
     }
 
     public async Task<ServiceResponse<string>> Login(UserLogin request)
