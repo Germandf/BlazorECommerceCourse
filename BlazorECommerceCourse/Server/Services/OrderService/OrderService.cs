@@ -85,9 +85,9 @@ public class OrderService : IOrderService
         return response;
     }
 
-    public async Task<ServiceResponse<bool>> PlaceOrder()
+    public async Task<ServiceResponse<bool>> PlaceOrder(int userId)
     {
-        var products = (await _cartService.GetStoredCartProducts()).Data;
+        var products = (await _cartService.GetStoredCartProducts(userId)).Data;
 
         if (products is null)
             return new() { Success = false, Data = false, Message = "User has no products in cart." };
@@ -103,10 +103,10 @@ public class OrderService : IOrderService
         }
 
         var order = new Order() { 
-            UserId = _authService.GetUserId(), OrderDate = DateTime.Now, TotalPrice = totalPrice, OrderItems = orderItems };
+            UserId = userId, OrderDate = DateTime.Now, TotalPrice = totalPrice, OrderItems = orderItems };
 
         _context.Orders.Add(order);
-        _context.CartItems.RemoveRange(_context.CartItems.Where(x => x.UserId == _authService.GetUserId()));
+        _context.CartItems.RemoveRange(_context.CartItems.Where(x => x.UserId == userId));
         await _context.SaveChangesAsync();
         return new() { Success = true, Data = true };
     }

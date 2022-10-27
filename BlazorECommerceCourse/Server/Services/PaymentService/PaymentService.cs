@@ -9,6 +9,8 @@ public class PaymentService : IPaymentService
     private readonly IAuthService _authService;
     private readonly IOrderService _orderService;
 
+    string? _secret = Environment.GetEnvironmentVariable("StripeCliKey");
+
     public PaymentService(
         ICartService cartService, 
         IAuthService authService, 
@@ -56,5 +58,26 @@ public class PaymentService : IPaymentService
         var service = new SessionService();
         var session = service.Create(options);
         return session;
+    }
+
+    public async Task<ServiceResponse<bool>> FulfillOrder(HttpRequest httpRequest)
+    {
+        var json = await new StreamReader(httpRequest.Body).ReadToEndAsync();
+        try
+        {
+            var stripeEvent = EventUtility.ConstructEvent(json, httpRequest.Headers["Stripe-Signature"], _secret);
+
+            if (stripeEvent.Type != Events.CheckoutSessionCompleted)
+                return new ServiceResponse<bool>() { Data = false, Success = false, Message = "Payment is not completed" };
+
+            var session = stripeEvent.Data.Object as Session;
+            var user = await _authService.GetUserByEmail(session?.CustomerEmail ?? "");
+            var success = await _orderService.PlaceOrder(user?.Id ?? 0);
+            return new ServiceResponse<bool>() { Data = success.Data, Success = success.Data };
+        }
+        catch (StripeException e)
+        {
+            return new ServiceResponse<bool>() { Data = false, Success = false, Message = e.Message };
+        }
     }
 }
