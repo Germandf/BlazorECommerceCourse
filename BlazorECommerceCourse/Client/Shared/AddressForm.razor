@@ -1,0 +1,82 @@
+﻿@inject IAddressService _addressService
+
+@if (_address is null)
+{
+    <span>
+        You haven't specified a delivery address yet. 
+        <button class="btn" @onclick="InitAddress">Add an address?</button>
+    </span>
+}
+else if (!_editAddress)
+{
+    <p>
+        <span>@_address.FirstName @_address.LastName</span><br/>
+        <span>@_address.Street</span><br/>
+        <span>@_address.City, @_address.State, @_address.Zip</span><br />
+        <span>@_address.Country</span><br />
+    </p>
+    <button class="btn btn-primary" @onclick="EditAddress">Edit</button>
+}
+else
+{
+    <EditForm Model="_address" OnSubmit="SubmitAddress">
+        <div class="mb-3">
+            <label for="firstname">First Name</label>
+            <InputText id="firstname" @bind-Value="_address.FirstName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="lastname">Last Name</label>
+            <InputText id="lastname" @bind-Value="_address.LastName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="street">Street</label>
+            <InputText id="street" @bind-Value="_address.Street" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="city">City</label>
+            <InputText id="city" @bind-Value="_address.City" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="state">State</label>
+            <InputText id="state" @bind-Value="_address.State" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="zip">Zip / Postal code</label>
+            <InputText id="zip" @bind-Value="_address.Zip" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label for="country">Country</label>
+            <InputText id="country" @bind-Value="_address.Country" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </EditForm>
+}
+
+@code {
+
+    private Address? _address = null;
+    bool _editAddress = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _address = await _addressService.GetAddress();
+    }
+
+    private async Task SubmitAddress()
+    {
+        _editAddress = false;
+        _address = await _addressService.AddOrUpdateAddress(_address!);
+    }
+
+    private void InitAddress()
+    {
+        _address = new Address();
+        _editAddress = true;
+    }
+
+    private void EditAddress()
+    {
+        _editAddress = true;
+    }
+
+}

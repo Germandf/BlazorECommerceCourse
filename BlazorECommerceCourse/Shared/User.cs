@@ -6,4 +6,5 @@ public class User
     public byte[] PasswordHash { get; set; } = null!;
     public byte[] PasswordSalt { get; set; } = null!;
     public DateTime DateCreated { get; set; } = DateTime.Now;
+    public Address Address { get; set; } = null!;
 }
