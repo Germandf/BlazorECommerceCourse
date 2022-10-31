@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorECommerceCourse.Server.Controllers;
 
@@ -17,6 +18,34 @@ public class CategoryController : ControllerBase
     public async Task<ActionResult<ServiceResponse<List<Category>>>> GetCategories()
     {
         var result = await _categoryService.GetCategories();
+        return Ok(result);
+    }
+
+    [HttpGet("admin"), Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ServiceResponse<List<Category>>>> GetAdminCategories()
+    {
+        var result = await _categoryService.GetAdminCategories();
+        return Ok(result);
+    }
+
+    [HttpDelete("admin/{id}"), Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ServiceResponse<List<Category>>>> DeleteCategory(int id)
+    {
+        var result = await _categoryService.DeleteCategory(id);
+        return Ok(result);
+    }
+
+    [HttpPost("admin"), Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ServiceResponse<List<Category>>>> AddCategory([FromBody] Category category)
+    {
+        var result = await _categoryService.AddCategory(category);
+        return Ok(result);
+    }
+
+    [HttpPut("admin"), Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ServiceResponse<List<Category>>>> UpdateCategory([FromBody] Category category)
+    {
+        var result = await _categoryService.UpdateCategory(category);
         return Ok(result);
     }
 }

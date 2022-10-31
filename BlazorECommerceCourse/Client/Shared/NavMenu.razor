@@ -1,4 +1,5 @@
 ﻿@inject ICategoryService _categoryService
+@implements IDisposable
 
 <div class="top-row ps-3 navbar navbar-dark navbar-toggler-wrapper">
     <div class="container-fluid">
@@ -34,11 +35,17 @@
     protected override async Task OnInitializedAsync()
     {
         await _categoryService.GetCategories();
+        _categoryService.OnChange += StateHasChanged;
     }
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    public void Dispose()
+    {
+        _categoryService.OnChange -= StateHasChanged;
     }
 
 }
