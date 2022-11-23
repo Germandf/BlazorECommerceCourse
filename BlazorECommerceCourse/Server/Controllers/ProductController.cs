@@ -21,6 +21,27 @@ public class ProductController : ControllerBase
         return Ok(response);
     }
 
+    [HttpPost("admin"), Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ServiceResponse<Product>>> CreateProduct(Product product)
+    {
+        var response = await _productService.CreateProduct(product);
+        return Ok(response);
+    }
+
+    [HttpPut("admin"), Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ServiceResponse<Product>>> UpdateProduct(Product product)
+    {
+        var response = await _productService.UpdateProduct(product);
+        return Ok(response);
+    }
+
+    [HttpDelete("admin/{productId}"), Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ServiceResponse<bool>>> DeleteProduct(int productId)
+    {
+        var response = await _productService.DeleteProduct(productId);
+        return Ok(response);
+    }
+
     [HttpGet]
     public async Task<ActionResult<ServiceResponse<List<Product>>>> GetProducts()
     {

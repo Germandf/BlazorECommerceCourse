@@ -5,9 +5,9 @@ namespace BlazorECommerceCourse.Shared;
 public class ProductVariant
 {
     [JsonIgnore]
-    public Product Product { get; set; } = null!;
+    public Product? Product { get; set; }
     public int ProductId { get; set; }
-    public ProductType ProductType { get; set; } = null!;
+    public ProductType? ProductType { get; set; }
     public int ProductTypeId { get; set; }
 
     [Column(TypeName = "decimal(18,2)")]
