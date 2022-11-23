@@ -9,13 +9,28 @@ public class ProductService : IProductService
         _context = context;
     }
 
+    public async Task<ServiceResponse<List<Product>>> GetAdminProducts()
+    {
+        var response = new ServiceResponse<List<Product>>()
+        {
+            Success = true,
+            Data = await _context.Products
+                .Where(x => !x.Deleted)
+                .Include(x => x.Variants.Where(y => !y.Deleted))
+                .ThenInclude(x => x.ProductType)
+                .ToListAsync()
+        };
+        return response;
+    }
+
     public async Task<ServiceResponse<List<Product>>> GetFeaturedProducts()
     {
         var response = new ServiceResponse<List<Product>>
         {
             Success = true,
-            Data = await _context.Products.Where(x => x.Featured)
-                .Include(x => x.Variants)
+            Data = await _context.Products
+                .Where(x => x.Featured && x.Visible && !x.Deleted)
+                .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
                 .ToListAsync()
         };
         return response;
@@ -24,9 +39,9 @@ public class ProductService : IProductService
     public async Task<ServiceResponse<Product?>> GetProduct(int productId)
     {
         var product = await _context.Products
-            .Include(x => x.Variants)
+            .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
             .ThenInclude(x => x.ProductType)
-            .FirstOrDefaultAsync(x => x.Id == productId);
+            .FirstOrDefaultAsync(x => x.Id == productId && x.Visible && !x.Deleted);
         if(product is null)
             return new() { Success = false, Message = "The requested product does not exist." };
         return new() { Success = true, Data = product };
@@ -38,7 +53,8 @@ public class ProductService : IProductService
         {
             Success = true,
             Data = await _context.Products
-                .Include(x => x.Variants)
+                .Where(x => x.Visible && !x.Deleted)
+                .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
                 .ToListAsync()
         };
         return response;
@@ -50,8 +66,8 @@ public class ProductService : IProductService
         {
             Success = true,
             Data = await _context.Products
-                .Where(x => x.Category.Url.ToLower().Equals(categoryUrl.ToLower()))
-                .Include(x => x.Variants)
+                .Where(x => x.Category.Url.ToLower().Equals(categoryUrl.ToLower()) && x.Visible && !x.Deleted)
+                .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
                 .ToListAsync()
         };
         return response;
@@ -89,9 +105,10 @@ public class ProductService : IProductService
         var pageResults = 2;
         var pageCount = Math.Ceiling((await FindProductsBySearchText(searchText)).Count / (float)pageResults);
         var products = await _context.Products
-                    .Where(x => x.Title.ToLower().Contains(searchText.ToLower()) ||
-                                x.Description.ToLower().Contains(searchText.ToLower()))
-                    .Include(x => x.Variants)
+                    .Where(x => (x.Title.ToLower().Contains(searchText.ToLower()) ||
+                        x.Description.ToLower().Contains(searchText.ToLower())) &&
+                        x.Visible && !x.Deleted)
+                    .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
                     .Skip((page - 1) * pageResults)
                     .Take(pageResults)
                     .ToListAsync();
@@ -112,9 +129,10 @@ public class ProductService : IProductService
     private async Task<List<Product>> FindProductsBySearchText(string searchText)
     {
         return await _context.Products
-                    .Where(x => x.Title.ToLower().Contains(searchText.ToLower()) ||
-                                x.Description.ToLower().Contains(searchText.ToLower()))
-                    .Include(x => x.Variants)
+                    .Where(x => (x.Title.ToLower().Contains(searchText.ToLower()) ||
+                        x.Description.ToLower().Contains(searchText.ToLower())) && 
+                        x.Visible && !x.Deleted)
+                    .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
                     .ToListAsync();
     }
 }
