@@ -30,7 +30,7 @@ else
             <label for="imageUrl">Image Url</label>
             <InputText id="imageUrl" @bind-Value="_product.ImageUrl" class="form-control" />
         </div>
-        <div class="mb-0">
+        <div class="mb-0" style="display: flex; flex-wrap: wrap; flex-direction: row; justify-content: center;">
             @if (!string.IsNullOrEmpty(_product.ImageUrl))
             {
                 <img src="@_product.ImageUrl" />
@@ -39,8 +39,19 @@ else
             {
                 foreach (var image in _product.Images)
                 {
+                    @*
                     <img src="@image.Data" />
                     <button type="button" @onclick="() => RemoveImage(image.Id)">Remove</button>
+                    *@
+                    <MudCard Class="ma-2">
+                        <MudCardContent>
+                            <MudImage Src="@image.Data" />
+                        </MudCardContent>
+                        <MudCardActions Style="justify-content: center;">
+                            <MudButton Variant="Variant.Filled" Color="Color.Error" 
+                                OnClick="() => RemoveImage(image)">Remove</MudButton>
+                        </MudCardActions>
+                    </MudCard>
                 }
             }
         </div>
@@ -210,11 +221,9 @@ else
         }
     }
 
-    private void RemoveImage(int id)
+    private void RemoveImage(Image image)
     {
-        var image = _product.Images.FirstOrDefault(x => x.Id == id);
-        if (image is not null)
-            _product.Images.Remove(image);
+        _product.Images.Remove(image);
     }
 
 }

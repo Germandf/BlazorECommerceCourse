@@ -94,6 +94,7 @@ public class ProductService : IProductService
             Data = await _context.Products
                 .Where(x => x.Category.Url.ToLower().Equals(categoryUrl.ToLower()) && x.Visible && !x.Deleted)
                 .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
+                .Include(x => x.Images)
                 .ToListAsync()
         };
         return response;
