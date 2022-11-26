@@ -31,7 +31,22 @@ else
             <InputText id="imageUrl" @bind-Value="_product.ImageUrl" class="form-control" />
         </div>
         <div class="mb-0">
-            <img src="@_product.ImageUrl" />
+            @if (!string.IsNullOrEmpty(_product.ImageUrl))
+            {
+                <img src="@_product.ImageUrl" />
+            }
+            else
+            {
+                foreach (var image in _product.Images)
+                {
+                    <img src="@image.Data" />
+                    <button type="button" @onclick="() => RemoveImage(image.Id)">Remove</button>
+                }
+            }
+        </div>
+        <div class="mb-0">
+            <label for="images">Image(s)</label>
+            <InputFile id="images" OnChange="OnFileChange" multiple @bind-Value="_product.ImageUrl" class="form-control" />
         </div>
         <div class="mb-0">
             <label for="description">Description</label>
@@ -180,6 +195,26 @@ else
             await _productService.DeleteProduct(_product);
             _navigationManager.NavigateTo("admin/products");
         }
+    }
+
+    private async Task OnFileChange(InputFileChangeEventArgs e)
+    {
+        var format = "image/png";
+        foreach (var image in e.GetMultipleFiles(10))
+        {
+            var resizedImage = await image.RequestImageFileAsync(format, 200, 200);
+            var buffer = new byte[resizedImage.Size];
+            await resizedImage.OpenReadStream().ReadAsync(buffer);
+            var imageData = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+            _product.Images.Add(new Image() { Data = imageData });
+        }
+    }
+
+    private void RemoveImage(int id)
+    {
+        var image = _product.Images.FirstOrDefault(x => x.Id == id);
+        if (image is not null)
+            _product.Images.Remove(image);
     }
 
 }

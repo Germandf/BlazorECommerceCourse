@@ -39,6 +39,7 @@ public class ProductService : IProductService
                 .Where(x => !x.Deleted)
                 .Include(x => x.Variants.Where(y => !y.Deleted))
                 .ThenInclude(x => x.ProductType)
+                .Include(x => x.Images)
                 .ToListAsync()
         };
         return response;
@@ -52,6 +53,7 @@ public class ProductService : IProductService
             Data = await _context.Products
                 .Where(x => x.Featured && x.Visible && !x.Deleted)
                 .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
+                .Include(x => x.Images)
                 .ToListAsync()
         };
         return response;
@@ -63,6 +65,7 @@ public class ProductService : IProductService
         var product = await _context.Products
             .Include(x => x.Variants.Where(y => !y.Deleted && (isAdmin || y.Visible)))
             .ThenInclude(x => x.ProductType)
+            .Include(x => x.Images)
             .FirstOrDefaultAsync(x => x.Id == productId && !x.Deleted && (isAdmin || x.Visible));
         if(product is null)
             return new() { Success = false, Message = "The requested product does not exist." };
@@ -77,6 +80,7 @@ public class ProductService : IProductService
             Data = await _context.Products
                 .Where(x => x.Visible && !x.Deleted)
                 .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
+                .Include(x => x.Images)
                 .ToListAsync()
         };
         return response;
@@ -131,6 +135,7 @@ public class ProductService : IProductService
                         x.Description.ToLower().Contains(searchText.ToLower())) &&
                         x.Visible && !x.Deleted)
                     .Include(x => x.Variants.Where(y => y.Visible && !y.Deleted))
+                    .Include(x => x.Images)
                     .Skip((page - 1) * pageResults)
                     .Take(pageResults)
                     .ToListAsync();
@@ -150,7 +155,9 @@ public class ProductService : IProductService
 
     public async Task<ServiceResponse<Product>> UpdateProduct(Product product)
     {
-        var dbProduct = await _context.Products.FindAsync(product.Id);
+        var dbProduct = await _context.Products
+            .Include(x => x.Images)
+            .FirstOrDefaultAsync(x => x.Id == product.Id);
         if (dbProduct is null)
             return new() { Success = false, Message = "Product not found" };
         dbProduct.Title = product.Title;
@@ -159,6 +166,8 @@ public class ProductService : IProductService
         dbProduct.CategoryId = product.CategoryId;
         dbProduct.Visible = product.Visible;
         dbProduct.Featured = product.Featured;
+        _context.Images.RemoveRange(dbProduct.Images);
+        dbProduct.Images = product.Images;
         foreach (var variant in product.Variants)
         {
             var dbVariant = await _context.ProductVariants.SingleOrDefaultAsync(x => 
